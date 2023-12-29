@@ -5,6 +5,7 @@ import {
   onCleanVotes,
   onConnect,
   onDisconnect,
+  onShowVotes,
   onVote,
 } from './socket-handlers.js';
 
@@ -28,6 +29,7 @@ io.on('connection', (socket) => {
   onConnect(socket, io);
   onVote(socket, io);
   onCleanVotes(socket, io);
+  onShowVotes(socket, io);
 });
 
 server.listen(PORT, () => {

@@ -8,13 +8,20 @@ import {
 import Statistics from '../components/statistics/statistics';
 import VotesList from '../components/votes-list';
 import VotingForm from '../components/voting-form';
-import { usePlanningPokerContext } from '../context/use-planning-poker-context';
+import { usePlanningStore } from '../store/use-planning-store';
 import './planning-poker-page.scss';
 
 const VotingPage = () => {
-  const { user, voterList } = usePlanningPokerContext();
-  console.log(voterList);
-  const { userName, team } = user || { userName: '', team: '' };
+  const user = usePlanningStore((s) => s.currentUser);
+  const isAdmin = usePlanningStore((s) => s.isAdmin);
+
+  if (!user) {
+    return null;
+  }
+
+  const { userName, team } = user;
+  const isDevOrAdmin = team === 'Dev' || isAdmin;
+  const isQAOrAdmin = team === 'QA' || isAdmin;
 
   return (
     <div className="content" style={{ color: '#eee' }}>
@@ -30,14 +37,14 @@ const VotingPage = () => {
           }
         >
           <div className="vote-section">
-            {team === 'Dev' && (
+            {isDevOrAdmin && (
               <div className="user-section">
-                <VotingForm team={team} username={userName} />
-                <VotesList team={team} username={userName} />
+                <VotingForm team="Dev" />
+                <VotesList team="Dev" username={userName} />
               </div>
             )}
             <div>
-              <Statistics team={'Dev'} />
+              <Statistics team="Dev" />
             </div>
           </div>
         </Window>
@@ -52,14 +59,14 @@ const VotingPage = () => {
           }
         >
           <div className="vote-section">
-            {team === 'QA' && (
+            {isQAOrAdmin && (
               <div className="user-section">
-                <VotingForm team={team} username={userName} />
-                <VotesList team={team} username={userName} />
+                <VotingForm team="QA" />
+                <VotesList team="QA" username={userName} />
               </div>
             )}
             <div>
-              <Statistics team={'QA'} />
+              <Statistics team="QA" />
             </div>
           </div>
         </Window>

@@ -1,7 +1,9 @@
+export type Team = 'Dev' | 'QA';
+
 export type Voter = {
   userName: string;
   vote: number | null;
-  team: string;
+  team: Team;
 };
 
 export const Events = {
@@ -9,5 +11,7 @@ export const Events = {
   updateVotersList: 'update_voters_list',
   vote: 'vote',
   connectMe: 'connect_me',
-  cleanVotes: 'clean_votes',
+  clearVotes: 'clean_votes',
+  showVotes: 'show_votes',
+  updateConfig: 'update_config',
 };

@@ -1,6 +1,4 @@
-import React from 'react';
-import useFirestoreCollection from '../hooks/use-firestore-collection';
-import usePokerConfig from '../hooks/use-poker-config';
+import { usePlanningStore } from '../store/use-planning-store';
 import './table-styles.scss';
 
 interface VotesListProps {
@@ -9,19 +7,17 @@ interface VotesListProps {
 }
 
 const VotesList = ({ username, team }: VotesListProps) => {
-  const [votes] = useFirestoreCollection(`${team}votes`);
-  const [config] = usePokerConfig(team);
+  const votes = usePlanningStore((s) =>
+    s.voterList.filter((v) => v.team === team)
+  );
+  const config = usePlanningStore((s) => s.config[team]);
 
-  if (!config) {
-    return null;
-  }
-
-  const getVoteView = (id: string, value: number) => {
+  const getVoteView = (id: string, value: number | null) => {
     if (config.showVotes) {
-      return value > -1 ? value : '?';
+      return value !== null && value > -1 ? value : '?';
     } else {
       if (id === username) {
-        return value > -1 ? value : '?';
+        return value !== null && value > -1 ? value : '?';
       } else {
         return '\u25AE';
       }
@@ -29,7 +25,7 @@ const VotesList = ({ username, team }: VotesListProps) => {
   };
 
   return (
-    <div className="votes-list" style={{ marginTop: 15 }}>
+    <div className="votes-list" style={{ marginTop: 15, color: 'black' }}>
       <div className="divTable">
         <div className="divTableBody">
           <div className="divTableRow">
@@ -40,13 +36,13 @@ const VotesList = ({ username, team }: VotesListProps) => {
               <strong>Points</strong>
             </div>
           </div>
-          {votes.map((vote) => (
-            <div className="divTableRow" key={vote.id}>
+          {votes.map((v) => (
+            <div className="divTableRow" key={v.userName}>
               <div className="divTableCell">{`${
-                vote.value !== 0 ? '\u2713' : ''
-              }${vote.id}`}</div>
+                (v.vote ?? -1) > 0 ? '\u2713' : ''
+              }${v.userName}`}</div>
               <div className="divTableCell">
-                {getVoteView(vote.id, vote.value)}
+                {getVoteView(v.userName, v.vote)}
               </div>
             </div>
           ))}

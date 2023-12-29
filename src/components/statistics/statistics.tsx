@@ -1,37 +1,37 @@
-import React from 'react';
+import { usePlanningStore } from '../../store/use-planning-store';
 import '../table-styles.scss';
-import useFirestoreCollection from '../../hooks/use-firestore-collection';
-import usePokerConfig from '../../hooks/use-poker-config';
 import './statistics.scss';
 
 const Statistics = ({ team }: { team: 'Dev' | 'QA' }) => {
-  const [votes] = useFirestoreCollection(`${team}votes`);
-  const [config] = usePokerConfig(team);
+  const votes = usePlanningStore((s) =>
+    s.voterList.filter((v) => v.team === team)
+  );
+  const config = usePlanningStore((s) => s.config[team]);
 
   if (!config?.showVotes) {
     return null;
   }
 
-  const positiveValues = votes.filter((v) => v.value > 0);
+  const positiveValues = votes.filter((v) => (v.vote ?? 0) > 0);
 
   const average =
     positiveValues.reduce((prev, curr) => {
-      return prev + curr.value;
+      return prev + (curr.vote ?? 0);
     }, 0) / (positiveValues.length === 0 ? 1 : positiveValues.length);
 
   const groupedVotes = votes
-    .filter((v) => v.value !== 0)
-    .reduce((grouped, vote) => {
-      const key = vote.value.toString();
+    .filter((v) => v.vote !== 0 && v.vote !== null)
+    .reduce((grouped, v) => {
+      const key = v.vote!.toString();
       if (!grouped[key]) {
         grouped[key] = 0;
       }
       grouped[key]++;
       return grouped;
-    }, {});
+    }, {} as { [key: string]: number });
 
   return (
-    <div className="statistics">
+    <div className="statistics" style={{ color: 'black' }}>
       <strong>Statistics</strong>
       <p>Average: {average}</p>
       <div className="divTable">

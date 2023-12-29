@@ -1,27 +1,17 @@
-import React from 'react';
 import { Button } from 'react-winplaza-98';
-import useFirestoreCollection from '../../hooks/use-firestore-collection';
-import usePokerConfig from '../../hooks/use-poker-config';
+import { usePlanningStore } from '../../store/use-planning-store';
 
 const VoteController = ({ team }: { team: 'Dev' | 'QA' }) => {
-  const [votes, { deleteDoc }] = useFirestoreCollection(`${team}votes`);
-  const [config, setConfig] = usePokerConfig(team);
+  const config = usePlanningStore((s) => s.config[team]);
+  const showVotes = usePlanningStore((s) => s.showVotes);
+  const clearVotes = usePlanningStore((s) => s.clearVotes);
 
   const handleClear = () => {
-    votes.forEach((vote) => {
-      deleteDoc(vote.id);
-    });
-    setConfig({
-      showVotes: false,
-      canVote: true,
-    });
+    clearVotes();
   };
 
   const handleShow = () => {
-    setConfig({
-      showVotes: true,
-      canVote: false,
-    });
+    showVotes(team);
   };
 
   return (

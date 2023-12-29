@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button, TextBox } from 'react-winplaza-98';
-import { usePlanningPokerContext } from '../context/use-planning-poker-context';
+import { usePlanningStore } from '../store/use-planning-store';
 
 const LoginPage = () => {
   const [userName, setUsername] = useState('');
   const [team, setTeam] = useState<'Dev' | 'QA'>('Dev');
-  const { connect } = usePlanningPokerContext();
+  const connect = usePlanningStore((s) => s.connectMe);
 
   return (
     <div className="content" style={{ color: '#eee' }}>
@@ -35,7 +35,7 @@ const LoginPage = () => {
         <Button
           disabled={!userName}
           onClick={() => {
-            connect({ userName, team });
+            connect({ userName, team, vote: null });
           }}
         >
           Connect

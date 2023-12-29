@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { Team } from '../src/types/vote-types';
 
 export type Voter = {
   userName: string;
@@ -12,9 +13,21 @@ export const Events = {
   vote: 'vote',
   connectMe: 'connect_me',
   cleanVotes: 'clean_votes',
+  showVotes: 'show_votes',
+  updateConfig: 'update_config',
 };
 
 export let votersList: Voter[] = [];
+const votesConfig = {
+  Dev: {
+    canVote: true,
+    showVotes: false,
+  },
+  QA: {
+    canVote: true,
+    showVotes: false,
+  },
+};
 
 export function onConnect(socket: Socket, io: Server) {
   socket.on(Events.connectMe, ({ userName, team }) => {
@@ -52,6 +65,21 @@ export function onCleanVotes(socket: Socket, io: Server) {
     console.log('clean votes');
     votersList = votersList.map((voter) => ({ ...voter, vote: null }));
     console.log(votersList);
+    votesConfig.Dev.canVote = true;
+    votesConfig.QA.canVote = true;
+    votesConfig.Dev.showVotes = false;
+    votesConfig.QA.showVotes = false;
+    io.emit(Events.updateConfig, votesConfig);
     io.emit(Events.updateVotersList, votersList);
+  });
+}
+
+export function onShowVotes(socket: Socket, io: Server) {
+  socket.on(Events.showVotes, ({ team }) => {
+    console.log('show votes', team);
+    votesConfig[team as Team].showVotes = true;
+    votesConfig[team as Team].canVote = false;
+    io.emit(Events.updateConfig, votesConfig);
+    io.emit(Events.showVotes, votesConfig);
   });
 }

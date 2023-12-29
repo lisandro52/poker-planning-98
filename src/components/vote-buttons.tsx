@@ -1,20 +1,15 @@
-import React from 'react';
 import { Button } from 'react-winplaza-98';
-import usePokerConfig from '../hooks/use-poker-config';
+import { usePlanningStore } from '../store/use-planning-store';
 
 interface VoteButtonsProps {
-  onVote: (value: number) => void;
+  onVote: (value: number | null) => void;
   team: 'Dev' | 'QA';
 }
 
-const valueRows = [
-  [0.5, 1, 2, 3],
-  [4, 5, 8, 13],
-  ['?']
-];
+const valueRows = [[0.5, 1, 2, 3], [4, 5, 8, 13], ['?']];
 
 const VoteButtons = ({ onVote, team }: VoteButtonsProps) => {
-  const [config] = usePokerConfig(team);
+  const config = usePlanningStore((s) => s.config[team]);
 
   if (!config?.canVote) {
     return null;
