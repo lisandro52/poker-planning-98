@@ -1,0 +1,14 @@
+{
+  "name": "planning-poker-98-server",
+  "version": "0.1.0",
+  "homepage": ".",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "express": "4",
+    "socket.io": "^4.7.2"
+  },
+  "scripts": {
+    "start:server": "node server.js"
+  }
+}

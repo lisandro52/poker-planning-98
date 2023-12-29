@@ -1,12 +1,3 @@
-import { Server, Socket } from 'socket.io';
-import { Team } from '../src/types/vote-types';
-
-export type Voter = {
-  userName: string;
-  vote: number | null;
-  team: string;
-};
-
 export const Events = {
   disconnectMe: 'disconnect_me',
   updateVotersList: 'update_voters_list',
@@ -17,7 +8,7 @@ export const Events = {
   updateConfig: 'update_config',
 };
 
-export let votersList: Voter[] = [];
+export let votersList = [];
 const votesConfig = {
   Dev: {
     canVote: true,
@@ -29,7 +20,7 @@ const votesConfig = {
   },
 };
 
-export function onConnect(socket: Socket, io: Server) {
+export function onConnect(socket, io) {
   socket.on(Events.connectMe, ({ userName, team }) => {
     console.log('user connected', userName);
     if (!votersList.some((voter) => voter.userName === userName)) {
@@ -40,7 +31,7 @@ export function onConnect(socket: Socket, io: Server) {
   });
 }
 
-export function onDisconnect(socket: Socket, io: Server) {
+export function onDisconnect(socket, io) {
   socket.on(Events.disconnectMe, ({ userName }) => {
     console.log('user disconnected', userName);
     votersList = votersList.filter((voter) => voter.userName !== userName);
@@ -49,7 +40,7 @@ export function onDisconnect(socket: Socket, io: Server) {
   });
 }
 
-export function onVote(socket: Socket, io: Server) {
+export function onVote(socket, io) {
   socket.on(Events.vote, ({ userName, vote }) => {
     console.log('vote', userName, vote);
     votersList = votersList.map((voter) =>
@@ -60,7 +51,7 @@ export function onVote(socket: Socket, io: Server) {
   });
 }
 
-export function onCleanVotes(socket: Socket, io: Server) {
+export function onCleanVotes(socket, io) {
   socket.on(Events.cleanVotes, () => {
     console.log('clean votes');
     votersList = votersList.map((voter) => ({ ...voter, vote: null }));
@@ -74,11 +65,11 @@ export function onCleanVotes(socket: Socket, io: Server) {
   });
 }
 
-export function onShowVotes(socket: Socket, io: Server) {
+export function onShowVotes(socket, io) {
   socket.on(Events.showVotes, ({ team }) => {
     console.log('show votes', team);
-    votesConfig[team as Team].showVotes = true;
-    votesConfig[team as Team].canVote = false;
+    votesConfig[team].showVotes = true;
+    votesConfig[team].canVote = false;
     io.emit(Events.updateConfig, votesConfig);
     io.emit(Events.showVotes, votesConfig);
   });

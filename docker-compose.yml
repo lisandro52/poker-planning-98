@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  back-end:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    container_name: back-end
+    working_dir: /usr/src/app
+    networks:
+      - node-network
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    tty: true
+    ports:
+      - '3001:3001'
+    command: yarn start:server
+
+  # front-end:
+  #   build:
+  #     context: react
+  #   container_name: front-end
+  #   working_dir: /usr/src/app
+  #   networks:
+  #     - node-network
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   tty: true
+  #   ports:
+  #     - '3000:3000'
+  #   command: yarn start
+
+  nginx:
+    build:
+      context: .
+    container_name: nginx
+    restart: always
+    tty: true
+    ports:
+      - '8000:80'
+    networks:
+      - node-network
+    depends_on:
+      - back-end
+
+networks:
+  node-network:
+    driver: bridge
